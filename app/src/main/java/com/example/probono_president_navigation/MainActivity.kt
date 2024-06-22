@@ -31,9 +31,15 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             Probono_President_NavigationTheme {
+                val seoul = LatLng(37.532600, 127.024612)
+                val cameraPositionState: CameraPositionState = rememberCameraPositionState {
+                    // 카메라 초기 위치를 설정합니다.
+                    position = CameraPosition(seoul, 11.0)
+                }
+
                 Box(Modifier.fillMaxSize()) {
                     NaverMap(
-                        //cameraPositionState = cameraPositionState,
+                        cameraPositionState = cameraPositionState,
                         modifier = Modifier.fillMaxSize(),
                         uiSettings = MapUiSettings(isLocationButtonEnabled = true),
                         locationSource = rememberFusedLocationSource(isCompassEnabled = true),
@@ -41,6 +47,12 @@ class MainActivity : ComponentActivity() {
                             locationTrackingMode = LocationTrackingMode.Face,
                         )
                     )
+                    Button(onClick = {
+                        // 카메라를 새로운 줌 레벨로 이동합니다.
+                        cameraPositionState.move(CameraUpdate.zoomIn())
+                    }) {
+                        Text(text = "Zoom In")
+                    }
                 }
             }
         }
