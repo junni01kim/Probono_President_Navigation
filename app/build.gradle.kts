@@ -7,6 +7,21 @@ android {
     namespace = "com.example.probono_president_navigation"
     compileSdk = 34
 
+    buildFeatures {
+        buildConfig = true
+        compose = true
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_11.toString()
+    }
+    composeOptions{
+        kotlinCompilerExtensionVersion = "1.5.2"
+    }
+
     defaultConfig {
         applicationId = "com.example.probono_president_navigation"
         minSdk = 24
@@ -28,15 +43,6 @@ android {
                 "proguard-rules.pro"
             )
         }
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
-    }
-
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
     }
 }
 

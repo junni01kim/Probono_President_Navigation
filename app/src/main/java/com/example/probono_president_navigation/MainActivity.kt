@@ -36,24 +36,24 @@ class MainActivity : ComponentActivity() {
                     // 카메라 초기 위치를 설정합니다.
                     position = CameraPosition(seoul, 11.0)
                 }
+                NaverMap(
+                    // 카메라 초기 위치 설정
+                    cameraPositionState = cameraPositionState,
 
-                Box(Modifier.fillMaxSize()) {
-                    NaverMap(
-                        cameraPositionState = cameraPositionState,
-                        modifier = Modifier.fillMaxSize(),
-                        uiSettings = MapUiSettings(isLocationButtonEnabled = true),
-                        locationSource = rememberFusedLocationSource(isCompassEnabled = true),
-                        properties = MapProperties(
-                            locationTrackingMode = LocationTrackingMode.Face,
-                        )
+                    // 화면 내 지도 크기 설정
+                    modifier = Modifier.fillMaxSize(),
+
+                    // 화면 제스처 세팅(현위치 버튼이 생성)
+                    uiSettings = MapUiSettings(isLocationButtonEnabled = true),
+
+                    // 위치 관련 세팅
+                    locationSource = rememberFusedLocationSource(isCompassEnabled = true),
+
+                    // 위치 추적 모드
+                    properties = MapProperties(
+                        locationTrackingMode = LocationTrackingMode.Follow
                     )
-                    Button(onClick = {
-                        // 카메라를 새로운 줌 레벨로 이동합니다.
-                        cameraPositionState.move(CameraUpdate.zoomIn())
-                    }) {
-                        Text(text = "Zoom In")
-                    }
-                }
+                )
             }
         }
     }
