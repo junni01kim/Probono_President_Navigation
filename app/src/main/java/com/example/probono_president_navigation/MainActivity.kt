@@ -4,16 +4,25 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.probono_president_navigation.ui.theme.Probono_President_NavigationTheme
+import com.naver.maps.geometry.LatLng
+import com.naver.maps.map.CameraPosition
+import com.naver.maps.map.CameraUpdate
+import com.naver.maps.map.compose.CameraPositionState
 import com.naver.maps.map.compose.ExperimentalNaverMapApi
+import com.naver.maps.map.compose.LocationTrackingMode
+import com.naver.maps.map.compose.MapProperties
+import com.naver.maps.map.compose.MapUiSettings
 import com.naver.maps.map.compose.NaverMap
+import com.naver.maps.map.compose.rememberCameraPositionState
+import com.naver.maps.map.compose.rememberFusedLocationSource
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalNaverMapApi::class)
@@ -22,13 +31,15 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             Probono_President_NavigationTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                Box(Modifier.fillMaxSize()) {
                     NaverMap(
-                        modifier = Modifier.fillMaxSize()
+                        //cameraPositionState = cameraPositionState,
+                        modifier = Modifier.fillMaxSize(),
+                        uiSettings = MapUiSettings(isLocationButtonEnabled = true),
+                        locationSource = rememberFusedLocationSource(isCompassEnabled = true),
+                        properties = MapProperties(
+                            locationTrackingMode = LocationTrackingMode.Face,
+                        )
                     )
                 }
             }
@@ -36,18 +47,12 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
 
+@OptIn(ExperimentalNaverMapApi::class)
 @Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
+fun NaverMapPreview() {
     Probono_President_NavigationTheme {
-        Greeting("Android")
+        NaverMap()
     }
 }
