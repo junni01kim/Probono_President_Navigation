@@ -26,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -44,12 +45,15 @@ import androidx.compose.ui.platform.LocalContext
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.LocationSource
 import com.naver.maps.map.NaverMap
+import com.naver.maps.map.compose.LocationOverlay
 import com.naver.maps.map.compose.Marker
 import com.naver.maps.map.compose.rememberCameraPositionState
 import com.naver.maps.map.compose.rememberMarkerState
+import com.naver.maps.map.overlay.LocationOverlay
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
 import com.naver.maps.map.util.MarkerIcons
+import kotlinx.coroutines.coroutineScope
 
 private val markerIcon = OverlayImage.fromResource(com.naver.maps.map.R.drawable.navermap_location_overlay_icon)
 
@@ -73,12 +77,16 @@ fun MainMap() {
     Box(Modifier.fillMaxSize()) {
         val locationTrackingMode = LocationTrackingMode.None
         val isCompassEnabled = true
+
         val cameraPositionState = rememberCameraPositionState()
 
-        val locationSource = remember { CustomLocationSource() }
+        var currentPosition by remember {
+            mutableStateOf(cameraPositionState.position.target)
+        }
+
         NaverMap(
             cameraPositionState = cameraPositionState,
-            locationSource = locationSource,
+            locationSource = rememberFusedLocationSource(),
             properties = MapProperties(
                 locationTrackingMode = locationTrackingMode,
             ),
@@ -87,10 +95,17 @@ fun MainMap() {
                 isCompassEnabled = isCompassEnabled,
             ),
             onLocationChange = {
-                locationSource.onLocationChange(LatLng(it.latitude, it.longitude))
+                currentPosition = LatLng(it.latitude, it.longitude)
+                Log.d("explain", currentPosition.toString())
             }
-        ){ }
-        
+        ){
+            LocationOverlay(
+                position = currentPosition,
+                icon = LocationOverlay.DEFAULT_ICON,
+                subIcon = LocationOverlay.DEFAULT_SUB_ICON_ARROW,
+            )
+        }
+
         Row(
             modifier = Modifier
                 .align(Alignment.TopCenter)
@@ -129,29 +144,6 @@ fun MainMap() {
         }
     }
 }
-
-private class CustomLocationSource : LocationSource {
-    private var listener: LocationSource.OnLocationChangedListener? = null
-
-    override fun activate(listener: LocationSource.OnLocationChangedListener) {
-        this.listener = listener
-    }
-
-    override fun deactivate() {
-        listener = null
-    }
-
-    fun onLocationChange(coord: LatLng) {
-        listener?.onLocationChanged(
-            Location("CustomLocationSource").apply {
-                latitude = coord.latitude
-                longitude = coord.longitude
-                accuracy = 100f
-            }
-        )
-    }
-}
-
 
 @OptIn(ExperimentalNaverMapApi::class)
 @Preview(showBackground = true)
