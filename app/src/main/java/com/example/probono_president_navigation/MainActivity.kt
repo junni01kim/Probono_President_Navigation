@@ -67,16 +67,6 @@ fun MainMap() {
     lateinit var naverMap:NaverMap
 
     Box(Modifier.fillMaxSize()) {
-/*        // 네이버 맵
-        NaverMap(
-            //cameraPositionState = cameraPositionState,
-            modifier = Modifier.fillMaxSize(),
-            uiSettings = MapUiSettings(isLocationButtonEnabled = true),
-            locationSource = rememberFusedLocationSource(isCompassEnabled = true),
-            properties = MapProperties(
-                locationTrackingMode = LocationTrackingMode.None,
-            )
-        )*/
         val locationTrackingMode = LocationTrackingMode.None
         val isCompassEnabled = true
         val cameraPositionState = rememberCameraPositionState()
