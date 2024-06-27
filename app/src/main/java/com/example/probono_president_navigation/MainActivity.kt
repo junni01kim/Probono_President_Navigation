@@ -1,13 +1,11 @@
 package com.example.probono_president_navigation
 
 import android.graphics.PointF
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -40,15 +38,19 @@ import com.naver.maps.map.compose.MapUiSettings
 import com.naver.maps.map.compose.NaverMap
 import com.naver.maps.map.compose.rememberFusedLocationSource
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.geometry.Offset
 import com.naver.maps.geometry.LatLng
 import com.naver.maps.map.NaverMap
+import com.naver.maps.map.compose.Marker
 import com.naver.maps.map.compose.rememberCameraPositionState
+import com.naver.maps.map.compose.rememberMarkerState
 import com.naver.maps.map.overlay.Marker
 import com.naver.maps.map.overlay.OverlayImage
+import com.naver.maps.map.util.MarkerIcons
+
+private val markerIcon = OverlayImage.fromResource(com.naver.maps.map.R.drawable.navermap_location_overlay_icon)
 
 class MainActivity : ComponentActivity() {
-    private val markerIcon = OverlayImage.fromResource(com.naver.maps.map.R.drawable.navermap_location_overlay_icon)
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -64,14 +66,12 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainMap() {
     var searchText by remember { mutableStateOf("") }
-    lateinit var naverMap:NaverMap
+    var currentLocation by remember { mutableStateOf(LatLng(0.0,0.0)) }
 
     Box(Modifier.fillMaxSize()) {
         val locationTrackingMode = LocationTrackingMode.None
         val isCompassEnabled = true
         val cameraPositionState = rememberCameraPositionState()
-
-        val (selectedOption, onOptionSelected) = remember { mutableStateOf(2) }
 
         NaverMap(
             cameraPositionState = cameraPositionState,
@@ -85,12 +85,18 @@ fun MainMap() {
                 isLocationButtonEnabled = true,
                 isCompassEnabled = isCompassEnabled,
             ),
-            onOptionChange = {
-                cameraPositionState.locationTrackingMode?.let {
-                    onOptionSelected(it.ordinal)
-                }
-            },
-        )
+            onLocationChange = {
+                currentLocation = LatLng(it.latitude, it.longitude)
+            }
+        ){
+            Marker(
+                state = rememberMarkerState(
+                    key = "currentLocation",
+                    position = currentLocation
+                ),
+                icon = markerIcon,
+            )
+        }
 
 
         Row(
@@ -106,7 +112,8 @@ fun MainMap() {
                 shape = RoundedCornerShape(20.dp),
                 modifier = Modifier
                     .padding(end = 5.dp)
-                    .width(65.dp).height(55.dp),
+                    .width(65.dp)
+                    .height(55.dp),
                 onClick = {
                     Log.d("explain", "clicked")
                     // Todo("Navigation 함수")
@@ -122,7 +129,8 @@ fun MainMap() {
             TextField(
                 value = searchText,
                 onValueChange = { searchText = it },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .height(55.dp),
                 shape = RoundedCornerShape(20.dp),
             )
